@@ -81,131 +81,161 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav      = document.querySelector('nav');
   const navLinks = document.querySelector('.nav-links');
 
+  // FIX : booléen d'état — plus fiable que lire les styles calculés
+  let menuOuvert = false;
+
   // Créer le bouton ☰
   const toggle = document.createElement('button');
   toggle.classList.add('nav-toggle');
   toggle.setAttribute('aria-label', 'Ouvrir le menu');
+  toggle.setAttribute('type', 'button');
   toggle.innerHTML = '<span></span><span></span><span></span>';
-  toggle.style.cssText = `
-    display: none;
-    flex-direction: column;
-    gap: 5px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    z-index: 9999;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  `;
+  Object.assign(toggle.style, {
+    display:                 'none',
+    flexDirection:           'column',
+    gap:                     '5px',
+    background:              'none',
+    border:                  'none',
+    cursor:                  'pointer',
+    padding:                 '8px',
+    zIndex:                  '9999',
+    WebkitTapHighlightColor: 'transparent',
+    touchAction:             'manipulation',
+  });
+  // Styler les barres du burger
+  toggle.querySelectorAll('span').forEach(s => {
+    Object.assign(s.style, {
+      display:         'block',
+      width:           '24px',
+      height:          '2px',
+      background:      '#8B4513',
+      borderRadius:    '2px',
+      transition:      'all 0.3s ease',
+      transformOrigin: 'center',
+      pointerEvents:   'none',
+    });
+  });
   nav.appendChild(toggle);
 
   // Créer l'overlay
   const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4);
-    z-index: 8000;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-  `;
+  Object.assign(overlay.style, {
+    display:    'none',
+    position:   'fixed',
+    top:        '0',
+    left:       '0',
+    width:      '100%',
+    height:     '100%',
+    background: 'rgba(0,0,0,0.4)',
+    zIndex:     '8000',
+  });
   document.body.appendChild(overlay);
 
+  /* ---- Ouvrir ---- */
   function ouvrirMenu() {
-    // FIX : setProperty avec 'important' pour écraser le !important du cssText
+    menuOuvert = true;
+    // Rendre visible PUIS déclencher la transition (reflow nécessaire)
     navLinks.style.setProperty('display', 'flex', 'important');
+    void navLinks.offsetWidth; // force reflow
     navLinks.style.setProperty('right', '0', 'important');
     toggle.classList.add('active');
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
+    toggle.setAttribute('aria-label', 'Fermer le menu');
   }
 
+  /* ---- Fermer ---- */
   function fermerMenu() {
+    menuOuvert = false;
     navLinks.style.setProperty('right', '-100%', 'important');
     toggle.classList.remove('active');
     overlay.style.display = 'none';
     document.body.style.overflow = '';
+    toggle.setAttribute('aria-label', 'Ouvrir le menu');
+    // Masquer après la fin de la transition (400 ms)
     setTimeout(() => {
-      if (window.innerWidth <= 900) {
-        // FIX : setProperty avec 'important' pour masquer correctement
+      if (!menuOuvert) {
         navLinks.style.setProperty('display', 'none', 'important');
       }
-    }, 400);
+    }, 420);
   }
 
-  // Afficher le bouton sur mobile
+  /* ---- Adapter selon la taille d'écran ---- */
   function checkMobile() {
     if (window.innerWidth <= 900) {
       toggle.style.display = 'flex';
-      navLinks.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        right: -100% !important;
-        height: 100vh !important;
-        width: 65% !important;
-        max-width: 280px !important;
-        background: rgba(250,247,242,0.99) !important;
-        flex-direction: column !important;
-        justify-content: center !important;
-        align-items: center !important;
-        gap: 36px !important;
-        padding: 80px 24px !important;
-        list-style: none !important;
-        transition: right 0.4s ease !important;
-        z-index: 9000 !important;
-        box-shadow: -4px 0 30px rgba(139,69,19,0.1) !important;
-        border-left: 1px solid #E8DDD0 !important;
-        display: none !important;
-        pointer-events: auto !important;
-      `;
+      // Appliquer les styles du panneau latéral une seule fois
+      if (!navLinks.dataset.mobileReady) {
+        navLinks.dataset.mobileReady = 'true';
+        navLinks.style.setProperty('position',        'fixed',                            'important');
+        navLinks.style.setProperty('top',             '0',                                'important');
+        navLinks.style.setProperty('right',           '-100%',                            'important');
+        navLinks.style.setProperty('height',          '100vh',                            'important');
+        navLinks.style.setProperty('width',           '65%',                              'important');
+        navLinks.style.setProperty('max-width',       '280px',                            'important');
+        navLinks.style.setProperty('background',      'rgba(250,247,242,0.99)',           'important');
+        navLinks.style.setProperty('flex-direction',  'column',                           'important');
+        navLinks.style.setProperty('justify-content', 'center',                           'important');
+        navLinks.style.setProperty('align-items',     'center',                           'important');
+        navLinks.style.setProperty('gap',             '36px',                             'important');
+        navLinks.style.setProperty('padding',         '80px 24px',                        'important');
+        navLinks.style.setProperty('list-style',      'none',                             'important');
+        navLinks.style.setProperty('transition',      'right 0.4s ease',                  'important');
+        navLinks.style.setProperty('z-index',         '9000',                             'important');
+        navLinks.style.setProperty('box-shadow',      '-4px 0 30px rgba(139,69,19,0.1)', 'important');
+        navLinks.style.setProperty('border-left',     '1px solid #E8DDD0',                'important');
+        navLinks.style.setProperty('display',         'none',                             'important');
+        navLinks.style.setProperty('pointer-events',  'auto',                             'important');
+      }
     } else {
       toggle.style.display = 'none';
       navLinks.removeAttribute('style');
+      navLinks.removeAttribute('data-mobile-ready');
       overlay.style.display = 'none';
       document.body.style.overflow = '';
+      menuOuvert = false;
     }
   }
 
   checkMobile();
   window.addEventListener('resize', () => {
     checkMobile();
-    if (window.innerWidth > 900) fermerMenu();
+    if (window.innerWidth > 900) menuOuvert = false;
   });
 
-  // Événements tactiles ET clic pour compatibilité mobile
+  // FIX : clic sur le bouton — utilise le booléen, jamais les styles
   toggle.addEventListener('click', (e) => {
-    e.preventDefault();
     e.stopPropagation();
-    const isOpen = navLinks.style.right === '0px' || navLinks.style.getPropertyValue('right') === '0';
-    isOpen ? fermerMenu() : ouvrirMenu();
+    menuOuvert ? fermerMenu() : ouvrirMenu();
   });
 
-  overlay.addEventListener('click', (e) => {
-    e.preventDefault();
-    fermerMenu();
-  });
+  overlay.addEventListener('click', () => fermerMenu());
 
-  // Fermer au clic sur un lien — compatible mobile
+  // Fermer au clic sur un lien
   document.querySelectorAll('.nav-links a').forEach(link => {
-    link.style.cssText += '-webkit-tap-highlight-color: transparent; touch-action: manipulation; display: block; padding: 8px 0;';
-    link.addEventListener('click', () => {
-      fermerMenu();
+    Object.assign(link.style, {
+      WebkitTapHighlightColor: 'transparent',
+      touchAction:             'manipulation',
+      display:                 'block',
+      padding:                 '8px 0',
     });
+    link.addEventListener('click', () => fermerMenu());
   });
 
 });
 
+/* ── FEEDBACK FORMULAIRE ── */
 function showFeedback(el, text, type) {
-  el.textContent = text;
-  el.style.display = 'block';
+  el.textContent    = text;
+  el.style.display  = 'block';
+  el.style.padding  = '10px 14px';
+  el.style.borderRadius = '6px';
+  el.style.marginTop = '8px';
   el.style.background = type === 'ok'
     ? 'rgba(22,163,74,0.12)'
     : type === 'warn'
     ? 'rgba(202,138,4,0.12)'
     : 'rgba(220,38,38,0.12)';
-  el.style.color = type === 'ok' ? '#15803d' : type === 'warn' ? '#a16207' : '#b91c1c';
+  el.style.color  = type === 'ok' ? '#15803d' : type === 'warn' ? '#a16207' : '#b91c1c';
   el.style.border = '1px solid ' + (type === 'ok' ? '#86efac' : type === 'warn' ? '#fde047' : '#fca5a5');
 }
