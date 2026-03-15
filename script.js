@@ -95,3 +95,38 @@ function showFeedback(el, text, type) {
   el.style.color = type === 'ok' ? '#15803d' : type === 'warn' ? '#a16207' : '#b91c1c';
   el.style.border = '1px solid ' + (type === 'ok' ? '#86efac' : type === 'warn' ? '#fde047' : '#fca5a5');
 }
+/* ── MENU MOBILE PORTFOLIO ── */
+// Créer le bouton menu et l'injecter dans la nav
+const nav = document.querySelector('nav');
+const navLinks = document.querySelector('.nav-links');
+
+const toggle = document.createElement('button');
+toggle.classList.add('nav-toggle');
+toggle.setAttribute('aria-label', 'Ouvrir le menu');
+toggle.innerHTML = '<span></span><span></span><span></span>';
+nav.appendChild(toggle);
+
+// Overlay sombre
+const overlay = document.createElement('div');
+overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:140;';
+document.body.appendChild(overlay);
+
+function ouvrirMenu() {
+    navLinks.classList.add('open');
+    toggle.classList.add('active');
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+function fermerMenu() {
+    navLinks.classList.remove('open');
+    toggle.classList.remove('active');
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+toggle.addEventListener('click', () => {
+    navLinks.classList.contains('open') ? fermerMenu() : ouvrirMenu();
+});
+overlay.addEventListener('click', fermerMenu);
+document.querySelectorAll('.nav-links a').forEach(l => l.addEventListener('click', fermerMenu));
+window.addEventListener('resize', () => { if (window.innerWidth > 900) fermerMenu(); });

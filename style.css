@@ -538,3 +538,110 @@ footer span { color: var(--warm); }
   .values-grid { grid-template-columns: 1fr; gap: 28px; }
   .about-img-box { max-width: 100%; aspect-ratio: 2/1; border-radius: 10px; }
 }
+/* ================================================
+   RESPONSIVE PORTFOLIO — AWA TOURÉ
+   À coller à la fin de style.css
+   ================================================ */
+
+/* ---- Bouton menu mobile ---- */
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 6px;
+    z-index: 200;
+}
+.nav-toggle span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    transform-origin: center;
+}
+.nav-toggle.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-toggle.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ================================================
+   TABLETTE — max 900px
+   ================================================ */
+@media (max-width: 900px) {
+    nav {
+        padding: 14px 24px !important;
+    }
+
+    /* Afficher le bouton menu */
+    .nav-toggle {
+        display: flex !important;
+    }
+
+    /* Cacher les liens par défaut */
+    .nav-links {
+        position: fixed !important;
+        top: 0 !important;
+        right: -100% !important;
+        height: 100vh !important;
+        width: 65% !important;
+        max-width: 280px !important;
+        background: rgba(250, 247, 242, 0.98) !important;
+        backdrop-filter: blur(16px) !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 36px !important;
+        padding: 80px 24px !important;
+        list-style: none !important;
+        transition: right 0.4s ease !important;
+        z-index: 150 !important;
+        box-shadow: -4px 0 30px rgba(139, 69, 19, 0.1) !important;
+        border-left: 1px solid var(--border) !important;
+    }
+
+    .nav-links.open {
+        right: 0 !important;
+    }
+
+    .nav-links a {
+        font-size: 1rem !important;
+        letter-spacing: 0.15em !important;
+    }
+}
+
+/* ================================================
+   MOBILE — max 600px
+   ================================================ */
+@media (max-width: 600px) {
+
+    nav { padding: 12px 20px !important; }
+
+    /* Hero */
+    .hero { padding: 80px 20px 40px !important; }
+    .hero-frame { padding: 32px 20px !important; }
+    .hero-name-script { font-size: 2.5rem !important; }
+    .hero-name-main   { font-size: 3rem !important; }
+    .hero-role        { font-size: 0.9rem !important; }
+    .hero-btns        { flex-direction: column !important; gap: 12px !important; align-items: center !important; }
+
+    /* Sections */
+    section { padding: 60px 20px !important; }
+
+    /* Vision cards */
+    .vision-grid { grid-template-columns: 1fr !important; }
+
+    /* Skills grid */
+    .skills-grid { grid-template-columns: 1fr !important; }
+
+    /* Projects grid */
+    .projects-grid { grid-template-columns: 1fr !important; }
+
+    /* Values */
+    .values { grid-template-columns: repeat(2, 1fr) !important; gap: 16px !important; }
+
+    /* Contact */
+    .contact-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+}
