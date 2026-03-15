@@ -115,20 +115,24 @@ document.addEventListener('DOMContentLoaded', () => {
   document.body.appendChild(overlay);
 
   function ouvrirMenu() {
-    navLinks.style.right = '0';
-    navLinks.style.display = 'flex';
+    // FIX : setProperty avec 'important' pour écraser le !important du cssText
+    navLinks.style.setProperty('display', 'flex', 'important');
+    navLinks.style.setProperty('right', '0', 'important');
     toggle.classList.add('active');
     overlay.style.display = 'block';
     document.body.style.overflow = 'hidden';
   }
 
   function fermerMenu() {
-    navLinks.style.right = '-100%';
+    navLinks.style.setProperty('right', '-100%', 'important');
     toggle.classList.remove('active');
     overlay.style.display = 'none';
     document.body.style.overflow = '';
     setTimeout(() => {
-      if (window.innerWidth <= 900) navLinks.style.display = 'none';
+      if (window.innerWidth <= 900) {
+        // FIX : setProperty avec 'important' pour masquer correctement
+        navLinks.style.setProperty('display', 'none', 'important');
+      }
     }, 400);
   }
 
@@ -166,15 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   checkMobile();
-  window.addEventListener('resize', () => { checkMobile(); if (window.innerWidth > 900) fermerMenu(); });
+  window.addEventListener('resize', () => {
+    checkMobile();
+    if (window.innerWidth > 900) fermerMenu();
+  });
 
   // Événements tactiles ET clic pour compatibilité mobile
   toggle.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    navLinks.style.display === 'flex' && navLinks.style.right === '0px'
-      ? fermerMenu()
-      : ouvrirMenu();
+    const isOpen = navLinks.style.right === '0px' || navLinks.style.getPropertyValue('right') === '0';
+    isOpen ? fermerMenu() : ouvrirMenu();
   });
 
   overlay.addEventListener('click', (e) => {
@@ -185,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Fermer au clic sur un lien — compatible mobile
   document.querySelectorAll('.nav-links a').forEach(link => {
     link.style.cssText += '-webkit-tap-highlight-color: transparent; touch-action: manipulation; display: block; padding: 8px 0;';
-    link.addEventListener('click', (e) => {
+    link.addEventListener('click', () => {
       fermerMenu();
     });
   });
